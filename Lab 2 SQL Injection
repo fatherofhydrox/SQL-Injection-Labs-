@@ -1,0 +1,75 @@
+Lab 2 -: SQL Injection Vulnerability Allowing Login Bypass
+
+1. Lab Information
+
+Lab Name: SQL Injection Vulnerability Allowing Login Bypass
+
+Severity: High
+
+Vulnerability Type: SQL Injection (Authentication Bypass)
+
+2. Vulnerability Description
+
+The application is vulnerable to SQL Injection in the login functionality. User-supplied input is not properly sanitized before being included in a SQL query.
+
+An attacker can manipulate the query logic and bypass authentication without knowing a valid password, gaining unauthorized access to privileged accounts such as the administrator.
+
+3. Impact
+Authentication bypass.
+Unauthorized access to administrator accounts.
+Complete compromise of application functionality.
+Potential access to sensitive user and system data.
+4. Steps to Reproduce
+Step 1: Navigate to Login Page
+
+Open the application's login page.
+
+Step 2: Enter SQL Injection Payload
+
+Username:
+
+administrator'--
+
+Password:
+
+anything
+Step 3: Submit Login Request
+
+The application processes the request and logs the attacker in as the administrator user.
+
+5. Technical Analysis
+
+Assume the application executes the following query:
+
+SELECT * FROM users
+WHERE username = 'administrator'
+AND password = 'password123'
+
+After injecting the payload:
+
+Username Input
+
+administrator'--
+
+The query becomes:
+
+SELECT * FROM users
+WHERE username = 'administrator'--'
+AND password = 'password123'
+Explanation
+-- starts a SQL comment.
+Everything after -- is ignored by the database.
+The password check is removed.
+The query effectively becomes:
+SELECT * FROM users
+WHERE username = 'administrator'
+
+Since the administrator account exists, authentication succeeds.
+
+6. Proof of Concept
+Payload
+administrator'--
+Result
+Successfully logged in as administrator.
+Authentication bypass achieved.
+Lab marked as solved.
